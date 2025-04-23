@@ -1,10 +1,10 @@
-import React from "react";
-import { api } from "~/trpc/server";
+"use client";
+import React, { Suspense } from "react";
+import { api } from "~/trpc/react";
 
-const CargoTable = async () => {
-  const list = await api.cargo.getAll();
+const CargoTableBody = () => {
+  const [list] = api.cargo.getAll.useSuspenseQuery();
 
-  void api.cargo.getLatest.prefetch();
   return (
     <div className="w-full overflow-x-auto rounded-lg bg-white/10 shadow-lg">
       <table className="min-w-full divide-y divide-purple-300">
@@ -54,7 +54,7 @@ const CargoTable = async () => {
                 {cargo.destination}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {new Date(cargo.updatedAt).toLocaleString()}
+                {new Date(cargo.updatedAt).toISOString()}
               </td>
             </tr>
           ))}
@@ -64,4 +64,10 @@ const CargoTable = async () => {
   );
 };
 
-export default CargoTable;
+export default function CargoTable() {
+  return (
+    <Suspense fallback={<div>Loading cargos...</div>}>
+      <CargoTableBody />
+    </Suspense>
+  );
+}
