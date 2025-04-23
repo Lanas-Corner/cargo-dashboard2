@@ -33,7 +33,6 @@ const initialCargo: CargoType = {
 export function CargoForm() {
   const [fields, setFields] = useState<CargoType>(initialCargo);
   const [success, setSuccess] = useState(false);
-  const [latestCargo] = api.cargo.getLatest.useSuspenseQuery();
   const utils = api.useUtils();
 
   const createCargo = api.cargo.create.useMutation({
