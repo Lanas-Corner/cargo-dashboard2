@@ -44,4 +44,18 @@ export const cargoRouter = createTRPCRouter({
 
     return cargo ?? null;
   }),
+
+  getStatusSummary: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.cargo.groupBy({
+      by: ["status"],
+      _count: { status: true },
+    });
+  }),
+
+  getDestinationSummary: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.cargo.groupBy({
+      by: ["destination"],
+      _count: { destination: true },
+    });
+  }),
 });
