@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const postRouter = createTRPCRouter({
+export const cargoRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
     .query(({ input }) => {
@@ -12,20 +12,36 @@ export const postRouter = createTRPCRouter({
     }),
 
   create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(
+      z.object({
+        trackingNo: z.string().min(1),
+        status: z.string().min(1),
+        origin: z.string().min(1),
+        destination: z.string().min(1),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.post.create({
+      return ctx.db.cargo.create({
         data: {
-          name: input.name,
+          trackingNo: input.trackingNo,
+          status: input.status,
+          origin: input.origin,
+          destination: input.destination,
         },
       });
     }),
 
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.cargo.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }),
+
   getLatest: publicProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.post.findFirst({
+    const cargo = await ctx.db.cargo.findFirst({
       orderBy: { createdAt: "desc" },
     });
 
-    return post ?? null;
+    return cargo ?? null;
   }),
 });
